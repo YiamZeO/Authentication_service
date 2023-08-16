@@ -4,6 +4,7 @@ import jwt
 import bcrypt
 import datetime
 import flask
+import base64
 
 KEY_WORD = 'SECRET_WORD'
 REFRESH_KEY_WORD = 'REFRESH_SECRET_WORD'
@@ -32,7 +33,7 @@ def take_tokens(request):
 @app.route("/user/authentication", methods=['POST'])
 def user_authentication():
     if flask.request.method == 'POST':
-        user_id = (flask.request.get_json())['user_id']
+        user_id = flask.request.args.get('user_id')
         request = {'_id': ObjectId(user_id)}
         tokens = take_tokens(request)
         return tokens
@@ -40,7 +41,7 @@ def user_authentication():
 @app.route("/user/refresh", methods=['POST'])
 def user_refresh():
     if flask.request.method == 'POST':
-        request = {'refresh_token': (flask.request.get_json())['refresh_token']}
+        request = {'refresh_token': (base64.b64decode((flask.request.get_data()))).decode('UTF-8')}
         tokens = take_tokens(request)
         return tokens
 
