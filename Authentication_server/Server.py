@@ -1,14 +1,13 @@
-import socket
-import json
 import pymongo
 from bson.objectid import ObjectId
-import base64
 import jwt
 import bcrypt
 import datetime
+import flask
 
 KEY_WORD = 'SECRET_WORD'
 REFRESH_KEY_WORD = 'REFRESH_SECRET_WORD'
+app = flask.Flask(__name__)
 
 def take_tokens(request):
     m_client = pymongo.MongoClient()
@@ -30,27 +29,21 @@ def take_tokens(request):
     m_client.close()
     return tokens
 
-serversocket = socket.socket(
-        socket.AF_INET, socket.SOCK_STREAM)
-serversocket.bind(('localhost', 5000))
-serversocket.listen()
-print('Server running...')
-while True:
-    connection, address = serversocket.accept()
-    print('Connection from ', address)
-    data = connection.recv(4096)
-    data = (base64.b64decode(data)).decode('UTF-8')
-    request_type = data[0]
-    request = {}
-    match (request_type):
-        case ('A'):
-            user_id = data[2:]
-            request = {'_id': ObjectId(user_id)}
-        case ('R'):
-            tokens = json.loads(data[2:])
-            request = {'refresh_token': tokens['refresh_token']}
-    tokens = take_tokens(request)
-    data = base64.b64encode((json.dumps(tokens)).encode('UTF-8'))
-    connection.send(data)
-    print('Connection from', address, 'received new tokens')   
-    connection.close()
+@app.route("/user/authentication", methods=['POST'])
+def user_authentication():
+    if flask.request.method == 'POST':
+        user_id = (flask.request.get_json())['user_id']
+        request = {'_id': ObjectId(user_id)}
+        tokens = take_tokens(request)
+        return tokens
+
+@app.route("/user/refresh", methods=['POST'])
+def user_refresh():
+    if flask.request.method == 'POST':
+        request = {'refresh_token': (flask.request.get_json())['refresh_token']}
+        tokens = take_tokens(request)
+        return tokens
+
+if __name__ == '__main__':
+    app.run()
+    
