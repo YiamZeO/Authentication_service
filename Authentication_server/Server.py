@@ -30,9 +30,9 @@ def take_tokens(request):
     m_client.close()
     return tokens
 
-@app.route("/user/authentication", methods=['GET'])
+@app.route("/user/authentication", methods=['POST'])
 def user_authentication():
-    if flask.request.method == 'GET':
+    if flask.request.method == 'POST':
         user_id = flask.request.args.get('user_id')
         request = {'_id': ObjectId(user_id)}
         tokens = take_tokens(request)

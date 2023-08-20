@@ -14,12 +14,13 @@ func Err_check(err error) {
 }
 
 func main() {
+	user_id := "64dcd4c0aad456d0e90a9f3b"
 	base, err := url.Parse("http://127.0.0.1:5000/user/authentication")
 	Err_check(err)
-	params := url.Values{}
-	params.Add("user_id", "64dcd4c0aad456d0e90a9f3b")
-	base.RawQuery = params.Encode()
-	respons, err := http.Get(base.String())
+	base.RawQuery = url.Values{
+		"user_id": {user_id},
+	}.Encode()
+	respons, err := http.PostForm(base.String(), nil)
 	Err_check(err)
 	defer respons.Body.Close()
 	rec_data, err := io.ReadAll(respons.Body)
