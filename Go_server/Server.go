@@ -3,6 +3,16 @@ package main
 import "fmt"
 
 func Take_tokens(filter map[string]string) map[string]string {
+	tokens := make(map[string]string)
+	if _, ok := filter["_id"]; ok {
+
+	} else if _, ok := filter["refresh"]; ok {
+
+	} else {
+		tokens["access_token"] = "Nil"
+		tokens["refresh_token"] = "Nil"
+	}
+	return tokens
 }
 
 type Server struct {
