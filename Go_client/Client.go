@@ -51,9 +51,13 @@ func main() {
 		"Refresh": "http://127.0.0.1:5000/user/refresh",
 	}
 
+	fmt.Println("Enter user id: ")
+	var user_id string
+	fmt.Scanln(&user_id)
+
 	// Пользователь: его id, токены
 	u := User{
-		User_id: "64dcd4c0aad456d0e90a9f3b",
+		User_id: user_id,
 		Tokens: map[string]string{
 			"access_token":  "Nil",
 			"refresh_token": "Nil",
