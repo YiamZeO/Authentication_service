@@ -26,7 +26,7 @@ func (u *User) Auth(a_url string) {
 	base.RawQuery = url.Values{
 		"user_id": {u.User_id},
 	}.Encode()
-	response, err := http.PostForm(base.String(), nil)
+	response, err := http.Post(base.String(), "application/x-www-form-urlencoded", nil)
 	Err_check(err)
 	defer response.Body.Close()
 	err = json.NewDecoder(response.Body).Decode(&u.Tokens)
