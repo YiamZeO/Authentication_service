@@ -17,3 +17,7 @@ Access, Refresh токены обоюдно связаны, Refresh операц
 
 Задание реализовано с помощью Golang и MongoDB  
 Пример работы   
+
+
+https://github.com/YiamZeO/Authentication_service/assets/102325825/be06b8d9-bdfc-4846-9865-1960ce7d8908
+
