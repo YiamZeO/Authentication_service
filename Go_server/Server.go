@@ -45,7 +45,9 @@ func (s *Server) Take_tokens(filter map[string]string) map[string]string {
 	m_filter := bson.M{}
 	if _, ok := filter["user_id"]; ok {
 		m_filter["_id"], err = primitive.ObjectIDFromHex(filter["user_id"])
-		Err_check(err)
+		if err != nil {
+			return tokens
+		}
 	} else if _, ok := filter["refresh_token"]; ok {
 		m_filter["refresh_token"] = filter["refresh_token"]
 	} else {
@@ -53,7 +55,9 @@ func (s *Server) Take_tokens(filter map[string]string) map[string]string {
 	}
 	c_user := map[string]string{}
 	err = users_coll.FindOne(context.TODO(), m_filter).Decode(&c_user)
-	Err_check(err)
+	if err != nil {
+		return tokens
+	}
 	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &Claims{
 		User_id: c_user["_id"],
