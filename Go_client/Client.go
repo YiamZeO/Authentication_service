@@ -55,10 +55,10 @@ func main() {
 	var user_id string
 	fmt.Scanln(&user_id)
 
-	// Пользователь: его id, токены
+	// Структура пользователя
 	u := User{
-		User_id: user_id,
-		Tokens: map[string]string{
+		User_id: user_id, // ID пользователя
+		Tokens: map[string]string{ // Токены пользователя
 			"access_token":  "Nil",
 			"refresh_token": "Nil",
 		},

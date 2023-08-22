@@ -2,7 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -76,12 +80,38 @@ func (s *Server) Take_tokens(filter map[string]string) map[string]string {
 	return tokens
 }
 
+func (s *Server) Post_Auth(w http.ResponseWriter, r *http.Request) {
+	user_id := r.URL.Query().Get("user_id")
+	filter := map[string]string{"user_id": user_id}
+	tokens := s.Take_tokens(filter)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tokens)
+	fmt.Println("User " + r.RemoteAddr + " get post auth operation")
+}
+
+func (s *Server) Post_Refresh(w http.ResponseWriter, r *http.Request) {
+	body_data, err := io.ReadAll(r.Body)
+	Err_check(err)
+	data := make([]byte, base64.StdEncoding.DecodedLen(len(body_data)))
+	_, err = base64.StdEncoding.Decode(data, body_data)
+	Err_check(err)
+	data_str := string(data)
+	filter := map[string]string{"refresh_token": data_str}
+	tokens := s.Take_tokens(filter)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tokens)
+	fmt.Println("User " + r.RemoteAddr + " get post refresh operation")
+}
+
 func main() {
-	s := Server{"Auth_key_word", "Refresh_key_word"}
-	fmt.Println(s.Take_tokens(map[string]string{
-		"user_id": "64dcd4c0aad456d0e90a9f3b",
-	}))
-	fmt.Println(s.Take_tokens(map[string]string{
-		"refresh_token": "b'$2b$12$DiONzXtxVqWZmW.nTjMtIeHglhKPjCpB5CiR99XcCsvoZDtKrVA9S'",
-	}))
+
+	// Структура для сервера
+	server := Server{
+		Auth_key_word:    "Auth_key_word",    // Secret word для токена авторизации
+		Refresh_key_word: "Refresh_key_word", // Secret word для refresh токена
+	}
+	http.HandleFunc("/user/authentication", server.Post_Auth)
+	http.HandleFunc("/user/refresh", server.Post_Refresh)
+	fmt.Println("Server is running on port 5000")
+	http.ListenAndServe(":5000", nil)
 }
